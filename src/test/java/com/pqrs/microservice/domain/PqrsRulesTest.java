@@ -8,6 +8,7 @@ import com.pqrs.microservice.infrastructure.persistence.entity.CitizenEntity;
 import com.pqrs.microservice.infrastructure.persistence.entity.PqrsEntity;
 import com.pqrs.microservice.infrastructure.persistence.entity.ResponsibleEntity;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 
 import java.time.LocalDate;
@@ -44,12 +45,18 @@ class PqrsRulesTest {
         PqrsEntity pqrs = new PqrsEntity(
                 PqrsType.PETICION, "Una petición válida", LocalDate.now(), citizen);
 
+        ReflectionTestUtils.setField(responsible, "id", 1L);
+        AnswerEntity answer = new AnswerEntity("Respuesta", LocalDate.now(), responsible);
+        ReflectionTestUtils.setField(answer, "id", 1L);
+
         pqrs.assignResponsible(responsible);
         pqrs.passToManagement();
-        pqrs.recordAnswer(new AnswerEntity("Respuesta", LocalDate.now(), responsible));
+        pqrs.recordAnswer(answer);
         pqrs.closeCase();
 
         assertThrows(BusinessRuleException.class, () -> pqrs.assignResponsible(responsible));
+
+
     }
 
 
